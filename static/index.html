@@ -1,0 +1,2836 @@
+ <!DOCTYPE html>
+ <html lang="zh">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>食愈健康生活 - 食物推荐</title>
+     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+     <script src="https://unpkg.com/lucide@latest"></script>
+     <style>
+         :root {
+             --bg: #f6f9ff;
+             --surface: #ffffff;
+             --surface-2: rgba(255, 255, 255, 0.78);
+             --text: #0f172a;
+             --muted: #64748b;
+             --brand: #2563eb;
+             --brand-700: #1d4ed8;
+             --accent: #38bdf8;
+             --border: rgba(15, 23, 42, 0.12);
+             --shadow: 0 18px 50px rgba(2, 6, 23, 0.10);
+             --shadow-sm: 0 10px 26px rgba(2, 6, 23, 0.08);
+             --elev-1: 0 1px 3px rgba(2, 6, 23, 0.10), 0 1px 2px rgba(2, 6, 23, 0.06);
+             --elev-2: 0 10px 26px rgba(2, 6, 23, 0.10), 0 3px 8px rgba(2, 6, 23, 0.06);
+             --elev-3: 0 22px 56px rgba(2, 6, 23, 0.14), 0 8px 18px rgba(2, 6, 23, 0.08);
+             --radius-sm: 10px;
+             --radius-md: 16px;
+             --radius-lg: 22px;
+             --focus-ring: 0 0 0 4px rgba(37, 99, 235, 0.18);
+             --font-sans: 'Roboto', 'Noto Sans SC', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+             --text-size: 16px;
+             --text-leading: 1.6;
+             --text-tracking: 0.01em;
+         }
+
+         * {
+             box-sizing: border-box;
+         }
+
+         body {
+             font-family: var(--font-sans);
+             font-size: var(--text-size);
+             line-height: var(--text-leading);
+             letter-spacing: var(--text-tracking);
+             text-rendering: optimizeLegibility;
+             -webkit-font-smoothing: antialiased;
+             -moz-osx-font-smoothing: grayscale;
+             background:
+                 radial-gradient(900px 420px at 12% 0%, rgba(56, 189, 248, 0.20), transparent 56%),
+                 radial-gradient(800px 420px at 88% 8%, rgba(37, 99, 235, 0.16), transparent 58%),
+                 var(--bg);
+             margin: 0;
+             padding: 0;
+             color: var(--text);
+         }
+         header {
+             background: linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(56, 189, 248, 0.86));
+             color: white;
+             padding: 26px 0;
+             text-align: center;
+         }
+         .header-inner {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             gap: 10px;
+         }
+         .page {
+             display: none;
+         }
+         .page.is-active {
+             display: block;
+             animation: fadeUp 260ms ease both;
+         }
+         .bottom-nav {
+             position: fixed;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             display: grid;
+             grid-template-columns: repeat(4, 1fr);
+             gap: 8px;
+             padding: 10px 12px;
+             background: rgba(255, 255, 255, 0.86);
+             backdrop-filter: blur(12px);
+             border-top: 1px solid var(--border);
+             z-index: 900;
+         }
+         .nav-btn {
+             border: 1px solid rgba(15, 23, 42, 0.08);
+             background: rgba(15, 23, 42, 0.02);
+             border-radius: 14px;
+             padding: 10px 8px;
+             cursor: pointer;
+             transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             gap: 4px;
+             color: var(--text);
+             touch-action: manipulation;
+         }
+         .nav-btn:hover {
+             background: rgba(37, 99, 235, 0.08);
+             border-color: rgba(37, 99, 235, 0.18);
+         }
+         .nav-btn.is-active {
+             background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(37, 99, 235, 0.18));
+             border-color: rgba(37, 99, 235, 0.26);
+         }
+         .nav-icon {
+             width: 32px;
+             height: 32px;
+             border-radius: 999px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             background: rgba(37, 99, 235, 0.08);
+         }
+         .nav-icon svg {
+             width: 20px;
+             height: 20px;
+             stroke-width: 2.2;
+         }
+         .nav-label {
+             font-size: 0.82rem;
+             font-weight: 700;
+             color: var(--muted);
+         }
+         .nav-btn.is-active .nav-label {
+             color: var(--text);
+         }
+         h1 {
+             margin: 0;
+             font-size: 1.8rem;
+             letter-spacing: 0.02em;
+             font-weight: 800;
+             line-height: 1.25;
+         }
+         .container {
+             width: 100%;
+             max-width: 1200px;
+             margin: 0 auto;
+             padding: 20px;
+         }
+         .layout {
+             display: grid;
+             grid-template-columns: 420px 1fr;
+             gap: 22px;
+             align-items: start;
+             padding-bottom: 110px;
+         }
+         .layout.layout-dashboard {
+             grid-template-columns: 1fr;
+             max-width: 560px;
+             margin: 0 auto;
+         }
+         .panel {
+             background-color: var(--surface);
+             border: 1px solid var(--border);
+             border-radius: var(--radius-lg);
+             box-shadow: var(--elev-2);
+             overflow: hidden;
+         }
+         .panel-header {
+             padding: 18px 18px;
+             border-bottom: 1px solid var(--border);
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 10px;
+             background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
+         }
+         .panel-header h2 {
+             margin: 0;
+             font-size: 1.12rem;
+             font-weight: 800;
+             letter-spacing: 0.01em;
+             line-height: 1.3;
+         }
+         .panel-header h2.panel-title {
+             font-size: 1.28rem;
+             letter-spacing: 0.01em;
+         }
+         .panel-body {
+             padding: 18px;
+         }
+         .form-group {
+             margin-bottom: 15px;
+         }
+         label {
+             display: block;
+             font-weight: 500;
+             font-size: 0.92rem;
+             letter-spacing: 0.01em;
+             margin-bottom: 5px;
+         }
+         select, input[type="text"], input[type="number"] {
+             width: 100%;
+             padding: 12px 12px;
+             font-size: 0.95rem;
+             line-height: 1.35;
+             border: 1px solid rgba(15, 23, 42, 0.16);
+             border-radius: var(--radius-md);
+             background: rgba(255, 255, 255, 0.92);
+             box-sizing: border-box;
+             transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+         }
+         select:focus, input[type="text"]:focus, input[type="number"]:focus {
+             outline: none;
+             border-color: rgba(37, 99, 235, 0.55);
+             box-shadow: var(--focus-ring);
+             background: #ffffff;
+         }
+         button {
+             background: linear-gradient(135deg, rgba(56, 189, 248, 0.98), rgba(37, 99, 235, 0.98));
+             color: white;
+             font-size: 1rem;
+             font-weight: 700;
+             letter-spacing: 0.01em;
+             padding: 12px 18px;
+             min-height: 46px;
+             border: none;
+             border-radius: 999px;
+             cursor: pointer;
+             width: 100%;
+             margin-top: 15px;
+             transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+             touch-action: manipulation;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             gap: 10px;
+             box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+         }
+         button:hover {
+             transform: translateY(-1px);
+             filter: saturate(1.06);
+             box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28);
+         }
+         button:focus {
+             outline: none;
+             box-shadow: var(--focus-ring), 0 16px 34px rgba(37, 99, 235, 0.26);
+         }
+         button:active {
+             transform: translateY(0px);
+         }
+         .btn-icon svg {
+             width: 18px;
+             height: 18px;
+         }
+         #food-list {
+             margin-top: 0;
+         }
+         #food-list ul {
+             list-style-type: none;
+             padding: 0;
+         }
+         #food-list li {
+             background-color: rgba(255, 255, 255, 0.96);
+             padding: 14px;
+             margin: 10px 0;
+             border-radius: 16px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             box-shadow: var(--elev-1);
+             transition: transform 0.18s ease, box-shadow 0.18s ease;
+         }
+         #food-list li:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--elev-2);
+         }
+         #food-list li span {
+             font-weight: 600;
+             color: #333;
+         }
+         .hint {
+             color: var(--muted);
+             font-size: 0.95rem;
+             line-height: 1.4;
+             margin: 0;
+         }
+         .meal-tabs {
+             display: grid;
+             grid-template-columns: repeat(3, 1fr);
+             gap: 10px;
+             margin-top: 12px;
+         }
+         .tab-btn {
+             width: 100%;
+             border-radius: 999px;
+             background: rgba(37, 99, 235, 0.08);
+             color: var(--text);
+             border: 1px solid rgba(37, 99, 235, 0.18);
+             padding: 10px 12px;
+             font-size: 1rem;
+             font-weight: 600;
+             cursor: pointer;
+             transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+             margin-top: 0;
+         }
+         .tab-btn:hover {
+             background: rgba(37, 99, 235, 0.12);
+         }
+         .tab-btn.is-active {
+             background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(37, 99, 235, 0.22));
+             border-color: rgba(37, 99, 235, 0.30);
+         }
+         .meal-grid {
+             display: grid;
+             grid-template-columns: repeat(3, 1fr);
+             gap: 15px;
+         }
+         .meal-card {
+             background-color: #ffffff;
+             padding: 15px;
+             border-radius: 12px;
+             border: 1px solid var(--border);
+             box-shadow: var(--shadow-sm);
+             transition: transform 0.2s ease, box-shadow 0.2s ease;
+         }
+         .food-thumb {
+             width: 100%;
+             height: 120px;
+             border-radius: 10px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             object-fit: cover;
+             background: rgba(15, 23, 42, 0.04);
+             margin-bottom: 10px;
+         }
+         .meal-card:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow);
+         }
+         .meal-card h3 {
+             margin: 0 0 10px 0;
+             font-size: 1.1rem;
+             color: #333;
+         }
+         .meal-actions {
+             margin-top: 10px;
+         }
+         .meal-actions button {
+             width: auto;
+             padding: 10px 14px;
+             font-size: 0.95rem;
+         }
+         .meta-box {
+             margin-top: 15px;
+             background: #ffffff;
+             padding: 15px;
+             border-radius: 8px;
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+             border: 1px solid var(--border);
+             animation: fadeUp 240ms ease both;
+         }
+         .meta-box h3 {
+             margin: 0 0 10px 0;
+             font-size: 1.1rem;
+             color: #333;
+         }
+         .result-shell {
+             min-height: 300px;
+             position: relative;
+         }
+         .result-anim {
+             animation: fadeUp 280ms ease both;
+         }
+         .loading-overlay {
+             position: absolute;
+             inset: 0;
+             background: rgba(244, 247, 252, 0.75);
+             backdrop-filter: blur(6px);
+             display: none;
+             align-items: center;
+             justify-content: center;
+             border-radius: 14px;
+             z-index: 10;
+         }
+         .loading-overlay.is-visible {
+             display: flex;
+         }
+         .toast {
+             position: fixed;
+             left: 50%;
+             bottom: 24px;
+             transform: translateX(-50%);
+             background: rgba(34, 197, 94, 0.95);
+             color: #fff;
+             padding: 12px 16px;
+             border-radius: 12px;
+             box-shadow: var(--shadow);
+             border: 1px solid rgba(255, 255, 255, 0.22);
+             display: none;
+             align-items: center;
+             gap: 10px;
+             z-index: 999;
+         }
+         .toast.is-visible {
+             display: flex;
+             animation: fadeUp 200ms ease both;
+         }
+         .toast-icon {
+             width: 22px;
+             height: 22px;
+             border-radius: 999px;
+             background: rgba(255, 255, 255, 0.18);
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             font-weight: 900;
+         }
+         .btn-secondary {
+             background: rgba(37, 99, 235, 0.08);
+             color: var(--text);
+             border: 1px solid rgba(37, 99, 235, 0.18);
+             box-shadow: none;
+         }
+         .btn-secondary:hover {
+             background: rgba(37, 99, 235, 0.12);
+             box-shadow: none;
+         }
+         .modal {
+             position: fixed;
+             inset: 0;
+             display: none;
+             z-index: 1000;
+         }
+         .modal.is-open {
+             display: block;
+         }
+         .modal-backdrop {
+             position: absolute;
+             inset: 0;
+             background: rgba(2, 6, 23, 0.52);
+             backdrop-filter: blur(6px);
+         }
+         .modal-dialog {
+             position: absolute;
+             left: 50%;
+             top: 54px;
+             transform: translateX(-50%);
+             width: min(980px, calc(100% - 28px));
+             max-height: calc(100% - 110px);
+             overflow: auto;
+         }
+         .panel-right {
+             display: inline-flex;
+             align-items: center;
+             gap: 10px;
+         }
+         .icon-btn {
+             width: 38px;
+             height: 38px;
+             min-height: 38px;
+             border-radius: 999px;
+             background: rgba(37, 99, 235, 0.10);
+             border: 1px solid rgba(37, 99, 235, 0.18);
+             color: var(--text);
+             cursor: pointer;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             box-shadow: none;
+             margin-top: 0;
+             padding: 0;
+         }
+         .icon-btn:hover {
+             background: rgba(37, 99, 235, 0.14);
+             transform: none;
+             filter: none;
+             box-shadow: none;
+         }
+         .icon-btn svg {
+             width: 18px;
+             height: 18px;
+         }
+         .summary-grid {
+             display: grid;
+             grid-template-columns: repeat(3, 1fr);
+             gap: 12px;
+             margin-top: 10px;
+         }
+         .stat {
+             background: rgba(15, 23, 42, 0.03);
+             border: 1px solid var(--border);
+             border-radius: 12px;
+             padding: 14px;
+             display: flex;
+             flex-direction: column;
+             gap: 6px;
+         }
+         .goal-layout {
+             display: grid;
+             gap: 12px;
+             margin-top: 10px;
+         }
+         .goal-head {
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             gap: 12px;
+             align-items: stretch;
+         }
+         .goal-box {
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background: rgba(255, 255, 255, 0.92);
+             border-radius: 16px;
+             padding: 14px;
+             box-shadow: var(--elev-1);
+         }
+         .goal-label {
+             color: var(--muted);
+             font-size: 0.86rem;
+             font-weight: 800;
+             letter-spacing: 0.01em;
+         }
+         .goal-value {
+             margin-top: 6px;
+             font-size: 1.55rem;
+             font-weight: 900;
+             letter-spacing: 0.01em;
+             line-height: 1.15;
+         }
+         .goal-rate {
+             margin-top: 6px;
+             font-size: 1.55rem;
+             font-weight: 900;
+             letter-spacing: 0.01em;
+             line-height: 1.15;
+         }
+         .goal-bar {
+             height: 12px;
+             border-radius: 999px;
+             background: rgba(15, 23, 42, 0.06);
+             overflow: hidden;
+             border: 1px solid rgba(15, 23, 42, 0.08);
+         }
+         .goal-bar-fill {
+             height: 100%;
+             width: 0%;
+             border-radius: 999px;
+             background: linear-gradient(135deg, rgba(56, 189, 248, 0.98), rgba(37, 99, 235, 0.98));
+             transition: width 220ms ease;
+         }
+         .goal-foot {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 10px;
+         }
+         .goal-meta {
+             color: var(--muted);
+             font-size: 0.9rem;
+             font-weight: 600;
+         }
+         .goal-slider {
+             margin-top: 2px;
+         }
+         .portfolio {
+             margin-top: 14px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background:
+                 radial-gradient(740px 280px at 20% 0%, rgba(56, 189, 248, 0.12), transparent 55%),
+                 radial-gradient(680px 300px at 92% 0%, rgba(37, 99, 235, 0.10), transparent 56%),
+                 rgba(255, 255, 255, 0.98);
+             border-radius: 18px;
+             padding: 14px;
+         }
+         .portfolio-head {
+             display: flex;
+             align-items: flex-start;
+             justify-content: space-between;
+             gap: 12px;
+         }
+         .portfolio-title {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+         }
+         .portfolio-title .badge {
+             display: inline-flex;
+             align-items: center;
+             gap: 8px;
+             font-size: 0.86rem;
+             font-weight: 800;
+             color: rgba(29, 78, 216, 0.95);
+             background: rgba(37, 99, 235, 0.12);
+             border: 1px solid rgba(37, 99, 235, 0.18);
+             padding: 6px 10px;
+             border-radius: 999px;
+             white-space: nowrap;
+         }
+         .portfolio-actions {
+             display: flex;
+             align-items: center;
+             gap: 10px;
+             flex-wrap: wrap;
+         }
+         .portfolio-actions button {
+             margin-top: 0;
+             width: auto;
+             padding: 10px 14px;
+             border-radius: 999px;
+         }
+         .feature-grid {
+             margin-top: 12px;
+             display: grid;
+             grid-template-columns: repeat(3, 1fr);
+             gap: 12px;
+         }
+         .feature {
+             border-radius: 16px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background: rgba(255, 255, 255, 0.92);
+             padding: 12px;
+             box-shadow: var(--elev-1);
+             display: grid;
+             gap: 6px;
+         }
+         .feature .top {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 10px;
+         }
+         .feature .name {
+             font-weight: 900;
+             color: var(--text);
+         }
+         .feature .desc {
+             color: var(--muted);
+             font-size: 0.92rem;
+             line-height: 1.45;
+         }
+         .steps {
+             margin-top: 12px;
+             display: grid;
+             grid-template-columns: 1fr;
+             gap: 8px;
+         }
+         .step {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 10px;
+             padding: 10px 12px;
+             border-radius: 14px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background: rgba(15, 23, 42, 0.02);
+         }
+         .step strong {
+             font-weight: 900;
+         }
+         @media (max-width: 900px) {
+             .feature-grid {
+                 grid-template-columns: 1fr;
+             }
+         }
+         .search-grid {
+             display: grid;
+             grid-template-columns: 1fr 1fr;
+             gap: 12px;
+         }
+         .search-grid .form-group {
+             margin-bottom: 0;
+         }
+         .search-actions {
+             display: flex;
+             gap: 10px;
+             align-items: center;
+             margin-top: 12px;
+         }
+         .search-actions button {
+             margin-top: 0;
+             width: auto;
+             padding: 10px 14px;
+             font-size: 0.95rem;
+             border-radius: 10px;
+         }
+         .search-hero {
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background:
+                 radial-gradient(780px 340px at 18% 10%, rgba(56, 189, 248, 0.14), transparent 55%),
+                 radial-gradient(720px 320px at 90% 0%, rgba(37, 99, 235, 0.12), transparent 55%),
+                 rgba(255, 255, 255, 0.98);
+             border-radius: 18px;
+             padding: 16px;
+             box-shadow: var(--elev-2);
+         }
+         .search-hero h3 {
+             margin: 0;
+             font-size: 1.15rem;
+             font-weight: 900;
+             letter-spacing: 0.01em;
+         }
+         .search-hero .hint {
+             margin-top: 6px;
+         }
+         .search-input-wrap {
+             margin-top: 12px;
+             position: relative;
+             display: grid;
+             grid-template-columns: auto 1fr auto;
+             align-items: center;
+             gap: 10px;
+             padding: 10px 10px;
+             border-radius: 999px;
+             background: rgba(255, 255, 255, 0.86);
+             border: 1px solid rgba(37, 99, 235, 0.22);
+             box-shadow: 0 16px 34px rgba(37, 99, 235, 0.14);
+         }
+         .search-input-wrap:focus-within {
+             box-shadow: var(--focus-ring), 0 18px 40px rgba(37, 99, 235, 0.18);
+             border-color: rgba(37, 99, 235, 0.36);
+         }
+         .search-icon {
+             width: 38px;
+             height: 38px;
+             border-radius: 999px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             background: rgba(37, 99, 235, 0.10);
+             border: 1px solid rgba(37, 99, 235, 0.16);
+             color: var(--text);
+         }
+         .search-icon svg {
+             width: 18px;
+             height: 18px;
+             stroke-width: 2.2;
+         }
+         .search-input {
+             border: none;
+             outline: none;
+             background: transparent;
+             font-size: 1rem;
+             font-weight: 600;
+             letter-spacing: 0.01em;
+             padding: 6px 4px;
+             min-width: 0;
+             color: var(--text);
+         }
+         .search-input::placeholder {
+             color: rgba(100, 116, 139, 0.85);
+             font-weight: 500;
+         }
+         .btn-search-go {
+             width: auto;
+             margin-top: 0;
+             min-height: 40px;
+             padding: 10px 14px;
+             font-size: 0.95rem;
+             border-radius: 999px;
+             box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+         }
+         .search-chips {
+             margin-top: 12px;
+             display: flex;
+             flex-wrap: wrap;
+             gap: 8px;
+         }
+         .chip {
+             width: auto;
+             margin-top: 0;
+             min-height: 34px;
+             padding: 8px 12px;
+             border-radius: 999px;
+             background: rgba(255, 255, 255, 0.86);
+             border: 1px solid rgba(37, 99, 235, 0.16);
+             color: var(--text);
+             font-weight: 800;
+             font-size: 0.92rem;
+             box-shadow: none;
+         }
+         .chip.is-selected {
+             background: rgba(37, 99, 235, 0.12);
+             border-color: rgba(37, 99, 235, 0.32);
+         }
+         .chip:hover {
+             transform: none;
+             filter: none;
+             box-shadow: none;
+             background: rgba(37, 99, 235, 0.08);
+         }
+         .pill-group {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 8px;
+             margin-top: 10px;
+         }
+         .pill {
+             display: inline-flex;
+             align-items: center;
+             gap: 8px;
+             padding: 8px 12px;
+             border-radius: 999px;
+             border: 1px solid rgba(37, 99, 235, 0.18);
+             background: rgba(37, 99, 235, 0.08);
+             color: rgba(15, 23, 42, 0.92);
+             font-weight: 800;
+             font-size: 0.92rem;
+         }
+         .pill.is-warn {
+             border-color: rgba(245, 158, 11, 0.28);
+             background: rgba(245, 158, 11, 0.10);
+         }
+         .condition-row {
+             margin-top: 10px;
+             display: grid;
+             gap: 10px;
+         }
+         .condition-custom {
+             width: 100%;
+             padding: 12px;
+             border-radius: 14px;
+             border: 1px solid rgba(15, 23, 42, 0.14);
+             background: rgba(255, 255, 255, 0.96);
+         }
+         .condition-custom:focus {
+             outline: none;
+             border-color: rgba(37, 99, 235, 0.55);
+             box-shadow: var(--focus-ring);
+         }
+         .search-filters {
+             margin-top: 14px;
+             padding-top: 14px;
+             border-top: 1px dashed rgba(15, 23, 42, 0.14);
+         }
+         .search-filters label {
+             font-size: 0.86rem;
+             font-weight: 800;
+             letter-spacing: 0.01em;
+             color: rgba(15, 23, 42, 0.78);
+         }
+         #page-search .meta-box h3 {
+             font-weight: 900;
+         }
+         .search-results {
+             display: grid;
+             gap: 12px;
+         }
+         .result-card {
+             border: 1px solid var(--border);
+             background: rgba(255, 255, 255, 0.95);
+             border-radius: 14px;
+             padding: 14px;
+             box-shadow: var(--shadow-sm);
+             transition: transform 0.2s ease, box-shadow 0.2s ease;
+         }
+         .result-card:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow);
+         }
+         .result-head {
+             display: flex;
+             justify-content: space-between;
+             gap: 10px;
+             align-items: flex-start;
+         }
+         .result-left {
+             display: flex;
+             gap: 10px;
+             align-items: center;
+             min-width: 0;
+         }
+         .result-thumb {
+             width: 56px;
+             height: 56px;
+             border-radius: 12px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             object-fit: cover;
+             flex: 0 0 auto;
+             background: rgba(15, 23, 42, 0.04);
+         }
+         .result-title {
+             overflow: hidden;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+             max-width: 520px;
+         }
+         .result-title {
+             font-weight: 800;
+             font-size: 1.05rem;
+         }
+         .badge {
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             padding: 4px 10px;
+             border-radius: 999px;
+             font-size: 0.78rem;
+             font-weight: 800;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background: rgba(15, 23, 42, 0.04);
+             color: var(--text);
+             white-space: nowrap;
+         }
+         .result-meta {
+             margin-top: 8px;
+             color: var(--muted);
+             font-size: 0.92rem;
+             line-height: 1.35;
+         }
+         .result-buttons {
+             margin-top: 12px;
+             display: flex;
+             gap: 10px;
+             flex-wrap: wrap;
+         }
+         .result-buttons button {
+             margin-top: 0;
+             width: auto;
+             padding: 10px 14px;
+             font-size: 0.95rem;
+         }
+         @media (max-width: 700px) {
+             .search-grid {
+                 grid-template-columns: 1fr;
+             }
+         }
+         .loading-card {
+             width: min(520px, 92%);
+             background: var(--surface);
+             border: 1px solid var(--border);
+             border-radius: 14px;
+             box-shadow: var(--shadow);
+             padding: 16px;
+         }
+         .progress {
+             height: 10px;
+             border-radius: 999px;
+             background: rgba(15, 23, 42, 0.10);
+             overflow: hidden;
+             margin-top: 12px;
+         }
+         .progress-bar {
+             height: 100%;
+             width: 40%;
+             background: linear-gradient(90deg, var(--brand), #4f46e5);
+             border-radius: 999px;
+             animation: progressMove 900ms ease-in-out infinite alternate;
+         }
+         .skeleton {
+             height: 12px;
+             border-radius: 8px;
+             background: linear-gradient(90deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.14), rgba(15, 23, 42, 0.08));
+             background-size: 200% 100%;
+             animation: shimmer 1.1s linear infinite;
+             margin: 10px 0;
+         }
+         .chart-box {
+             display: grid;
+             grid-template-columns: 1fr;
+             gap: 12px;
+         }
+         .chart-wrap {
+             background: rgba(15, 23, 42, 0.03);
+             border: 1px dashed rgba(15, 23, 42, 0.14);
+             border-radius: 12px;
+             padding: 10px;
+         }
+         .chart-title {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 10px;
+             margin-bottom: 6px;
+         }
+         .chart-title span {
+             color: var(--muted);
+             font-size: 0.9rem;
+         }
+         .segmented {
+             display: inline-flex;
+             border-radius: 999px;
+             border: 1px solid rgba(37, 99, 235, 0.16);
+             background: rgba(37, 99, 235, 0.06);
+             overflow: hidden;
+         }
+         .seg-btn {
+             width: auto;
+             margin-top: 0;
+             min-height: 34px;
+             padding: 6px 12px;
+             font-size: 0.92rem;
+             font-weight: 800;
+             border-radius: 0;
+             background: transparent;
+             color: var(--text);
+             box-shadow: none;
+         }
+         .seg-btn:hover {
+             transform: none;
+             filter: none;
+             box-shadow: none;
+             background: rgba(37, 99, 235, 0.08);
+         }
+         .seg-btn.is-active {
+             background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(37, 99, 235, 0.22));
+         }
+         .history-list {
+             display: grid;
+             gap: 10px;
+             margin-top: 10px;
+         }
+         .history-item {
+             display: grid;
+             grid-template-columns: 1fr auto;
+             gap: 10px;
+             align-items: center;
+             padding: 12px;
+             border-radius: 14px;
+             border: 1px solid rgba(15, 23, 42, 0.10);
+             background: rgba(255, 255, 255, 0.96);
+             box-shadow: var(--elev-1);
+         }
+         .history-main {
+             min-width: 0;
+         }
+         .history-title {
+             font-weight: 900;
+             font-size: 0.98rem;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+         }
+         .history-meta {
+             margin-top: 4px;
+             color: var(--muted);
+             font-size: 0.9rem;
+             line-height: 1.35;
+         }
+         .history-right {
+             display: inline-flex;
+             align-items: center;
+             gap: 8px;
+             justify-content: flex-end;
+         }
+         .date-input {
+             width: 140px;
+             padding: 10px 10px;
+             font-size: 0.92rem;
+             line-height: 1.2;
+             border: 1px solid rgba(15, 23, 42, 0.14);
+             border-radius: 12px;
+             background: rgba(255, 255, 255, 0.96);
+         }
+         .date-input:focus {
+             outline: none;
+             border-color: rgba(37, 99, 235, 0.55);
+             box-shadow: var(--focus-ring);
+         }
+         @keyframes fadeUp {
+             from { opacity: 0; transform: translateY(6px); }
+             to { opacity: 1; transform: translateY(0); }
+         }
+         @keyframes shimmer {
+             0% { background-position: 0% 50%; }
+             100% { background-position: 200% 50%; }
+         }
+         @keyframes progressMove {
+             from { width: 22%; }
+             to { width: 86%; }
+         }
+         @media (max-width: 900px) {
+             .layout {
+                 grid-template-columns: 1fr;
+                 padding-bottom: 110px;
+             }
+             .meal-grid {
+                 grid-template-columns: 1fr;
+             }
+             footer {
+                 position: static;
+             }
+         }
+         @media (max-width: 420px) {
+             h1 {
+                 font-size: 1.45rem;
+             }
+             .panel-body {
+                 padding: 14px;
+             }
+             select, input[type="text"], input[type="number"] {
+                 padding: 12px;
+             }
+             button {
+                 padding: 12px 16px;
+             }
+         }
+         footer {
+             background: linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(56, 189, 248, 0.86));
+             color: white;
+             text-align: center;
+             padding: 10px 0;
+             position: static;
+         }
+     </style>
+ </head>
+ <body>
+     <header>
+         <div class="header-inner">
+             <h1>食愈健康生活 - 个性化食物推荐</h1>
+         </div>
+     </header>
+ 
+     <div class="container">
+         <div id="page-dashboard" class="page is-active">
+             <div class="layout layout-dashboard">
+                 <section class="panel" aria-label="用户输入">
+                     <div class="panel-header">
+                         <h2 class="panel-title">获取个性化推荐</h2>
+                         <span class="hint">选择一餐并点击获取</span>
+                     </div>
+                     <div class="panel-body">
+                         <div class="meal-tabs" role="tablist" aria-label="餐食切换">
+                             <button class="tab-btn is-active" type="button" data-time="早餐" role="tab">早餐</button>
+                             <button class="tab-btn" type="button" data-time="午餐" role="tab">午餐</button>
+                             <button class="tab-btn" type="button" data-time="晚餐" role="tab">晚餐</button>
+                         </div>
+                         <form id="recommendation-form">
+                             <div class="form-group" style="margin-top: 14px;">
+                                 <label for="time">请选择时间：</label>
+                                 <select id="time" required>
+                                     <option value="早餐">早餐</option>
+                                     <option value="午餐">午餐</option>
+                                     <option value="晚餐">晚餐</option>
+                                 </select>
+                             </div>
+                             <div class="form-group">
+                                 <label for="city">请输入城市：</label>
+                                 <input type="text" id="city" value="Beijing" required>
+                             </div>
+                             <div class="form-group">
+                                 <label for="max_calories">最大热量（卡路里）：</label>
+                                 <input type="number" id="max_calories" value="500" required>
+                             </div>
+                             <div class="form-group">
+                                 <label>特殊病症（可多选）：</label>
+                                 <div class="condition-row">
+                                     <div class="search-chips" id="condition-chips" aria-label="病症选择">
+                                         <button type="button" class="chip" data-cond="糖尿病">糖尿病</button>
+                                         <button type="button" class="chip" data-cond="高血压">高血压</button>
+                                         <button type="button" class="chip" data-cond="高血脂">高血脂</button>
+                                         <button type="button" class="chip" data-cond="肥胖">肥胖</button>
+                                     </div>
+                                     <input type="text" id="condition-custom" class="condition-custom" placeholder="其他病症（回车添加）" autocomplete="off">
+                                     <input type="hidden" id="condition" value="">
+                                 </div>
+                                 <p class="hint" style="margin: 8px 0 0 0;">示例：可组合选择“糖尿病 + 高血压”。</p>
+                             </div>
+                             <button id="btn-recommend" type="submit"><span class="btn-icon" aria-hidden="true"><i data-lucide="sparkles"></i></span><span>获取推荐食物</span></button>
+                         </form>
+
+                         <div class="portfolio" aria-label="作品集展示">
+                             <div class="portfolio-head">
+                                 <div>
+                                     <div class="portfolio-title">
+                                         <span class="badge"><i data-lucide="presentation"></i><span>作品集模式</span></span>
+                                         <h3 style="margin: 0;">从推荐到追踪：一条完整的健康饮食闭环</h3>
+                                     </div>
+                                     <p class="hint" style="margin: 8px 0 0 0;">一键演示会写入“演示数据”（可随时恢复你的原数据）。适用于答辩/展示。</p>
+                                 </div>
+                                 <div class="portfolio-actions">
+                                     <button type="button" id="btn-demo-run"><span class="btn-icon" aria-hidden="true"><i data-lucide="play"></i></span><span>一键演示</span></button>
+                                     <button type="button" class="btn-secondary" id="btn-demo-exit"><span class="btn-icon" aria-hidden="true"><i data-lucide="undo-2"></i></span><span>退出演示</span></button>
+                                 </div>
+                             </div>
+
+                             <div class="feature-grid" role="list">
+                                 <div class="feature" role="listitem">
+                                     <div class="top"><div class="name">更年轻的白蓝视觉</div><i data-lucide="palette"></i></div>
+                                     <div class="desc">统一色板、胶囊按钮与 Lucide 图标，整体更轻盈、更“产品化”。</div>
+                                 </div>
+                                 <div class="feature" role="listitem">
+                                     <div class="top"><div class="name">推荐结果弹窗</div><i data-lucide="layout-panel-top"></i></div>
+                                     <div class="desc">用户完成选择后再弹出结果，减少信息噪声，让主流程更聚焦。</div>
+                                 </div>
+                                 <div class="feature" role="listitem">
+                                     <div class="top"><div class="name">近 7 天趋势与可编辑日期</div><i data-lucide="trending-up"></i></div>
+                                     <div class="desc">趋势图支持热量/糖分切换，历史记录支持近 7 天修改日期。</div>
+                                 </div>
+                             </div>
+
+                             <div class="steps" aria-label="演示流程">
+                                 <div class="step"><span><strong>Step 1</strong> 注入近 7 天示例餐食</span><span class="hint">无需后端</span></div>
+                                 <div class="step"><span><strong>Step 2</strong> 自动跳转到“进度”页展示趋势</span><span class="hint">可切换热量/糖分</span></div>
+                                 <div class="step"><span><strong>Step 3</strong> 回到“我的”页可调整目标并实时刷新</span><span class="hint">进度条联动</span></div>
+                             </div>
+                         </div>
+                     </div>
+                 </section>
+             </div>
+         </div>
+
+         <div id="result-modal" class="modal" aria-hidden="true">
+             <div class="modal-backdrop" data-close="1"></div>
+             <div class="modal-dialog" role="dialog" aria-modal="true" aria-label="推荐结果">
+                 <section class="panel result-shell" aria-label="推荐结果">
+                     <div class="panel-header">
+                         <h2>推荐结果</h2>
+                         <div class="panel-right">
+                             <span class="hint" id="result-subtitle">等待生成推荐</span>
+                             <button type="button" class="icon-btn" id="btn-close-result" aria-label="关闭"><i data-lucide="x"></i></button>
+                         </div>
+                     </div>
+                     <div class="panel-body">
+                         <div id="food-list"></div>
+                     </div>
+                     <div class="loading-overlay" id="loading-overlay" aria-hidden="true">
+                         <div class="loading-card">
+                             <div class="skeleton" style="height: 16px; width: 65%;"></div>
+                             <div class="skeleton" style="height: 12px; width: 92%;"></div>
+                             <div class="skeleton" style="height: 12px; width: 84%;"></div>
+                             <div class="progress"><div class="progress-bar"></div></div>
+                         </div>
+                     </div>
+                 </section>
+             </div>
+         </div>
+
+     <div id="page-search" class="page">
+         <div class="layout" style="grid-template-columns: 1fr;">
+             <section class="panel" aria-label="搜索">
+                 <div class="panel-header">
+                     <h2>搜索</h2>
+                     <span class="hint" id="search-subtitle">搜索历史餐食与食物库</span>
+                 </div>
+                 <div class="panel-body">
+                     <div class="search-hero" aria-label="高级搜索">
+                         <h3>想吃点什么？</h3>
+                         <p class="hint" style="margin: 6px 0 0 0;">输入关键词，或点一个快捷标签开始探索。</p>
+                         <div class="search-input-wrap">
+                             <span class="search-icon" aria-hidden="true"><i data-lucide="search"></i></span>
+                             <input type="text" id="search-query" class="search-input" placeholder="例如：燕麦 / 鸡胸 / 早餐 / 低糖" autocomplete="off">
+                             <button type="button" id="btn-search" class="btn-search-go"><span class="btn-icon" aria-hidden="true"><i data-lucide="arrow-right"></i></span><span>搜索</span></button>
+                         </div>
+                         <div class="search-chips" id="search-chips">
+                             <button type="button" class="chip" data-q="低糖" data-action="chip">低糖</button>
+                             <button type="button" class="chip" data-q="高蛋白" data-action="chip">高蛋白</button>
+                             <button type="button" class="chip" data-q="减脂" data-action="chip">减脂</button>
+                             <button type="button" class="chip" data-q="早餐" data-action="chip">早餐</button>
+                             <button type="button" class="chip" data-q="鸡胸" data-action="chip">鸡胸</button>
+                         </div>
+
+                         <div class="search-filters">
+                             <div class="search-grid">
+                                 <div class="form-group">
+                                     <label for="search-source">搜索范围</label>
+                                     <select id="search-source">
+                                         <option value="history" selected>历史餐食</option>
+                                         <option value="foods">食物库</option>
+                                         <option value="all">历史 + 食物库</option>
+                                     </select>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="search-time">餐次筛选</label>
+                                     <select id="search-time">
+                                         <option value="" selected>全部</option>
+                                         <option value="早餐">早餐</option>
+                                         <option value="午餐">午餐</option>
+                                         <option value="晚餐">晚餐</option>
+                                     </select>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="search-type">类型筛选</label>
+                                     <select id="search-type">
+                                         <option value="" selected>全部</option>
+                                         <option value="主食">主食</option>
+                                         <option value="蛋白">蛋白</option>
+                                         <option value="蔬菜">蔬菜</option>
+                                     </select>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="search-limit">展示数量</label>
+                                     <select id="search-limit">
+                                         <option value="10" selected>10</option>
+                                         <option value="20">20</option>
+                                         <option value="50">50</option>
+                                     </select>
+                                 </div>
+                             </div>
+                             <div class="search-actions">
+                                 <button type="button" class="btn-secondary" id="btn-search-reset">重置</button>
+                                 <button type="button" class="btn-secondary" id="btn-go-dashboard">回到推荐页</button>
+                             </div>
+                             <p class="hint" id="search-status" style="margin: 12px 0 0 0;"></p>
+                         </div>
+                     </div>
+
+                     <div class="meta-box">
+                         <h3>结果</h3>
+                         <div id="search-results" class="search-results"></div>
+                         <p class="hint" id="search-empty" style="margin: 10px 0 0 0; display:none;">没有找到结果。试试换个关键词或调整筛选。</p>
+                     </div>
+                 </div>
+             </section>
+         </div>
+     </div>
+
+     <div id="page-progress" class="page">
+         <div class="layout" style="grid-template-columns: 1fr;">
+             <section class="panel" aria-label="进度追踪">
+                 <div class="panel-header">
+                     <h2>进度追踪</h2>
+                     <span class="hint" id="progress-subtitle">基于“添加到餐食”的本地记录</span>
+                 </div>
+                 <div class="panel-body">
+                     <div class="meta-box">
+                         <h3>本周摘要</h3>
+                         <div class="summary-grid">
+                             <div class="stat">
+                                 <div class="label">记录餐次</div>
+                                 <div class="value" id="stat-meals">0</div>
+                             </div>
+                             <div class="stat">
+                                 <div class="label">平均热量</div>
+                                 <div class="value" id="stat-avg">0</div>
+                             </div>
+                             <div class="stat">
+                                 <div class="label">目标达成率</div>
+                                 <div class="value" id="stat-rate">0%</div>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div class="meta-box">
+                         <div class="chart-title">
+                             <h3 style="margin: 0;">近 7 天趋势</h3>
+                             <div style="display:flex; align-items:center; gap:10px;">
+                                 <span>最近 7 天</span>
+                                 <div class="segmented" role="tablist" aria-label="趋势指标">
+                                     <button type="button" class="seg-btn is-active" data-metric="calories" role="tab">热量</button>
+                                     <button type="button" class="seg-btn" data-metric="sugar" role="tab">糖分</button>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="chart-wrap" style="height: 260px;">
+                             <canvas id="calorie-chart" aria-label="热量趋势图"></canvas>
+                         </div>
+                         <p class="hint" id="progress-empty" style="margin: 10px 0 0 0; display:none;">暂无记录：先在“推荐”页点击“添加到餐食”。</p>
+                     </div>
+
+                     <div class="meta-box">
+                         <div class="chart-title">
+                             <h3 style="margin: 0;">最近记录</h3>
+                             <span>可修改日期（近 7 天）</span>
+                         </div>
+                         <div id="progress-history" class="history-list"></div>
+                     </div>
+                 </div>
+             </section>
+         </div>
+     </div>
+
+     <div id="page-profile" class="page">
+         <div class="layout" style="grid-template-columns: 1fr;">
+             <section class="panel" aria-label="我的">
+                 <div class="panel-header">
+                     <h2>我的</h2>
+                     <span class="hint">本地设置（不改后端）</span>
+                 </div>
+                 <div class="panel-body">
+                     <div class="meta-box">
+                         <h3>每日热量目标</h3>
+                         <p class="hint">用于“进度”页的目标达成率计算。</p>
+                         <div class="goal-layout">
+                             <div class="goal-head">
+                                 <div class="goal-box">
+                                     <div class="goal-label">当前目标</div>
+                                     <div class="goal-value" id="goal-value">1200 卡</div>
+                                 </div>
+                                 <div class="goal-box">
+                                     <div class="goal-label">完成度</div>
+                                     <div class="goal-rate" id="goal-rate">0%</div>
+                                 </div>
+                             </div>
+                             <div class="goal-bar" aria-hidden="true">
+                                 <div class="goal-bar-fill" id="goal-bar"></div>
+                             </div>
+                             <div class="goal-foot">
+                                 <div class="goal-meta">建议范围：1000-2500</div>
+                                 <div class="goal-meta" id="goal-avg">近7天平均：0 卡</div>
+                             </div>
+                             <div class="goal-slider">
+                                 <input id="goal-range" type="range" min="1000" max="2500" step="50" value="1200" style="width: 100%;">
+                             </div>
+                         </div>
+                     </div>
+                     <div class="meta-box">
+                         <h3>数据管理</h3>
+                         <p class="hint">清空“添加到餐食”的本地记录。</p>
+                         <button type="button" class="btn-secondary" id="btn-clear-history">清空餐食记录</button>
+                     </div>
+                     <div class="meta-box">
+                        <h3>天气 Key 验证</h3>
+                        <p class="hint">用于检查 OpenWeatherMap API Key 是否有效（可临时输入 Key，不会保存到后端）。</p>
+                        <div class="form-group">
+                            <label for="verify-city">城市</label>
+                            <input id="verify-city" type="text" placeholder="Beijing / 北京" value="Beijing">
+                        </div>
+                        <div class="form-group">
+                            <label for="verify-key">OpenWeather API Key（可选）</label>
+                            <input id="verify-key" type="text" placeholder="留空则使用服务器环境变量">
+                        </div>
+                        <button type="button" class="btn-secondary" id="btn-verify-weather">验证 Key</button>
+                        <div class="meta-box" style="margin-top: 12px;">
+                            <h3 style="margin-top: 0;">验证结果</h3>
+                            <p class="hint" id="verify-result">尚未验证</p>
+                        </div>
+                    </div>
+                 </div>
+             </section>
+         </div>
+     </div>
+ 
+     <footer>
+         <p>© 2025 食愈健康生活 - 所有权利保留</p>
+    </footer>
+
+    <div id="add-success-toast" class="toast" role="status" aria-live="polite">
+        <span class="toast-icon">✓</span>
+         <span>已成功添加到餐食！</span>
+     </div>
+
+     <nav class="bottom-nav" aria-label="底部导航">
+         <button class="nav-btn is-active" type="button" data-page="dashboard">
+             <span class="nav-icon" aria-hidden="true"><i data-lucide="home"></i></span>
+             <span class="nav-label">首页</span>
+         </button>
+         <button class="nav-btn" type="button" data-page="search">
+             <span class="nav-icon" aria-hidden="true"><i data-lucide="search"></i></span>
+             <span class="nav-label">搜索</span>
+         </button>
+         <button class="nav-btn" type="button" data-page="progress">
+             <span class="nav-icon" aria-hidden="true"><i data-lucide="trending-up"></i></span>
+             <span class="nav-label">进度</span>
+         </button>
+         <button class="nav-btn" type="button" data-page="profile">
+             <span class="nav-icon" aria-hidden="true"><i data-lucide="user"></i></span>
+             <span class="nav-label">我的</span>
+         </button>
+     </nav>
+ 
+     <script>
+         const state = {
+             lastMealResponse: null,
+             chart: null,
+             userId: 1,
+             chartJsLoadingPromise: null,
+             progressChart: null,
+             progressMetric: 'calories',
+             foodsCatalog: null,
+             foodsCatalogLoadingPromise: null
+         };
+
+         const STORAGE_KEY_HISTORY = 'meal_history_v1';
+         const STORAGE_KEY_GOAL = 'daily_calorie_goal_v1';
+         const STORAGE_KEY_ACTIVE_PAGE = 'active_page_v1';
+         const STORAGE_KEY_HISTORY_BACKUP = 'meal_history_backup_v1';
+         const STORAGE_KEY_DEMO_ACTIVE = 'demo_mode_v1';
+
+         function safeText(value) {
+             if (value === null || value === undefined || value === '') return '无';
+             return String(value);
+         }
+
+         function hashCode(str) {
+             const s = safeText(str);
+             let h = 0;
+             for (let i = 0; i < s.length; i++) {
+                 h = (h << 5) - h + s.charCodeAt(i);
+                 h |= 0;
+             }
+             return h;
+         }
+
+         function svgThumbDataUri(title, subtitle) {
+             const t = safeText(title).replace(/\s+/g, ' ').trim().slice(0, 12);
+             const sub = safeText(subtitle).replace(/\s+/g, ' ').trim().slice(0, 8);
+             const base = Math.abs(hashCode(`${t}|${sub}`));
+             const hue1 = base % 360;
+             const hue2 = (hue1 + 46) % 360;
+             const c1 = `hsl(${hue1} 82% 56%)`;
+             const c2 = `hsl(${hue2} 82% 56%)`;
+             const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${c1}"/>
+      <stop offset="1" stop-color="${c2}"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="28" fill="url(#g)"/>
+  <rect x="24" y="24" width="592" height="312" rx="22" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.22)"/>
+  <text x="48" y="186" fill="rgba(255,255,255,0.96)" font-size="44" font-weight="800" font-family="Noto Sans SC, system-ui, -apple-system, Segoe UI, Arial">${t}</text>
+  <text x="48" y="236" fill="rgba(255,255,255,0.92)" font-size="26" font-weight="700" font-family="Noto Sans SC, system-ui, -apple-system, Segoe UI, Arial">${sub}</text>
+</svg>`;
+             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+         }
+
+         function getFoodImageSrc(food) {
+             if (food && food.image_url) return String(food.image_url);
+             if (!food) return svgThumbDataUri('暂无推荐', '');
+             return svgThumbDataUri(food.food_name || '食物', `${safeText(food.food_type)} · ${safeText(food.recommend_time)}`);
+         }
+
+         function getFoodImageFallback(food) {
+             if (!food) return svgThumbDataUri('暂无推荐', '');
+             return svgThumbDataUri(food.food_name || '食物', `${safeText(food.food_type)} · ${safeText(food.recommend_time)}`);
+         }
+
+         function setLoading(isLoading) {
+             const overlay = document.getElementById('loading-overlay');
+             overlay.classList.toggle('is-visible', Boolean(isLoading));
+             overlay.setAttribute('aria-hidden', String(!isLoading));
+         }
+
+         function setSubtitle(text) {
+             const el = document.getElementById('result-subtitle');
+             if (el) el.textContent = text;
+         }
+
+         function openResultModal() {
+             const modal = document.getElementById('result-modal');
+             if (!modal) return;
+             modal.classList.add('is-open');
+             modal.setAttribute('aria-hidden', 'false');
+         }
+
+         function closeResultModal() {
+             const modal = document.getElementById('result-modal');
+             if (!modal) return;
+             modal.classList.remove('is-open');
+             modal.setAttribute('aria-hidden', 'true');
+         }
+
+         function getMealPicked() {
+             const m = state.lastMealResponse && state.lastMealResponse.meal;
+             if (!m) return [];
+             return [m.staple, m.protein, m.vegetable].filter(Boolean);
+         }
+
+         function recalcTotals() {
+             if (!state.lastMealResponse || !state.lastMealResponse.meal) return;
+             const picked = getMealPicked();
+             const totalCalories = picked.reduce((sum, f) => sum + (Number(f.calories) || 0), 0);
+             const totalSugar = picked.reduce((sum, f) => sum + (Number(f.sugar_content) || 0), 0);
+             state.lastMealResponse.meal.nutrition_total = {
+                 calories: totalCalories,
+                 sugar_content: totalSugar
+             };
+         }
+
+         function buildChartData() {
+             const m = state.lastMealResponse && state.lastMealResponse.meal;
+             if (!m) return null;
+             const calories = {
+                 staple: Number(m.staple && m.staple.calories) || 0,
+                 protein: Number(m.protein && m.protein.calories) || 0,
+                 vegetable: Number(m.vegetable && m.vegetable.calories) || 0
+             };
+             return {
+                 labels: ['主食', '蛋白', '蔬菜'],
+                 values: [calories.staple, calories.protein, calories.vegetable]
+             };
+         }
+
+         function destroyChart() {
+             if (!state.chart) return;
+             try {
+                 state.chart.destroy();
+             } catch (e) {
+                 console.warn('Failed to destroy chart:', e);
+             }
+             state.chart = null;
+         }
+
+         function loadScriptOnce(src) {
+             return new Promise((resolve, reject) => {
+                 const existing = document.querySelector(`script[data-src="${src}"]`);
+                 if (existing) {
+                     existing.addEventListener('load', () => resolve());
+                     existing.addEventListener('error', () => reject(new Error('load failed')));
+                     return;
+                 }
+                 const s = document.createElement('script');
+                 s.src = src;
+                 s.async = true;
+                 s.setAttribute('data-src', src);
+                 s.onload = () => resolve();
+                 s.onerror = () => reject(new Error('load failed'));
+                 document.head.appendChild(s);
+             });
+         }
+
+         async function ensureChartJsLoaded() {
+             if (window.Chart) return true;
+             if (!state.chartJsLoadingPromise) {
+                 state.chartJsLoadingPromise = (async () => {
+                     try {
+                         await loadScriptOnce('https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js');
+                         return true;
+                     } catch (e1) {
+                         try {
+                             await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js');
+                             return true;
+                         } catch (e2) {
+                             return false;
+                         }
+                     }
+                 })();
+             }
+             return await state.chartJsLoadingPromise;
+         }
+
+         function renderChart() {
+             const chartData = buildChartData();
+             if (!chartData) return;
+             const canvas = document.getElementById('food-type-chart');
+             const statusEl = document.getElementById('chart-status');
+             if (!canvas) return;
+
+             if (!window.Chart) {
+                 if (statusEl) {
+                     statusEl.textContent = '图表组件加载中...（如长时间无响应，请检查网络/代理是否可访问外部 CDN）';
+                 }
+                 ensureChartJsLoaded().then((ok) => {
+                     if (!ok) {
+                         if (statusEl) statusEl.textContent = '图表组件加载失败：无法访问外部 CDN。你可以开启代理/放行 cdnjs 或 unpkg，或让我改为本地引入。';
+                         return;
+                     }
+                     if (statusEl) statusEl.textContent = '';
+                     destroyChart();
+                     renderChart();
+                 });
+                 return;
+             }
+             if (statusEl) statusEl.textContent = '';
+
+             const data = {
+                 labels: chartData.labels,
+                 datasets: [
+                     {
+                         label: '热量占比（卡路里）',
+                         data: chartData.values,
+                         backgroundColor: ['rgba(79, 70, 229, 0.85)', 'rgba(34, 197, 94, 0.85)', 'rgba(245, 158, 11, 0.85)'],
+                         borderColor: ['rgba(79, 70, 229, 1)', 'rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)'],
+                         borderWidth: 1
+                     }
+                 ]
+             };
+
+             const options = {
+                 responsive: true,
+                 maintainAspectRatio: false,
+                 plugins: {
+                     legend: {
+                         position: 'bottom',
+                         labels: {
+                             boxWidth: 14,
+                             color: '#1f2937'
+                         }
+                     },
+                     tooltip: {
+                         callbacks: {
+                             label: (ctx) => `${ctx.label}: ${ctx.raw} 卡路里`
+                         }
+                     }
+                 }
+             };
+
+             if (state.chart) {
+                 state.chart.data = data;
+                 state.chart.update();
+                 return;
+             }
+
+             state.chart = new Chart(canvas.getContext('2d'), {
+                 type: 'doughnut',
+                 data,
+                 options
+             });
+         }
+
+         function readHistory() {
+             try {
+                 const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
+                 const parsed = raw ? JSON.parse(raw) : [];
+                 return Array.isArray(parsed) ? parsed : [];
+             } catch (e) {
+                 return [];
+             }
+         }
+
+         function writeHistory(items) {
+             try {
+                 localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(items));
+             } catch (e) {
+             }
+         }
+
+         function pad2(n) {
+             return String(n).padStart(2, '0');
+         }
+
+         function dayKeyFromTs(ts) {
+             const d = new Date(Number(ts) || Date.now());
+             return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+         }
+
+         function formatShortDateLabel(ts) {
+             const d = new Date(Number(ts) || Date.now());
+             return `${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+         }
+
+         function formatDateInputValue(ts) {
+             return dayKeyFromTs(ts);
+         }
+
+         function parseDateInputValue(v) {
+             const m = /^\d{4}-\d{2}-\d{2}$/.exec(String(v || ''));
+             if (!m) return null;
+             const [y, mo, d] = v.split('-').map(x => Number(x));
+             if (!y || !mo || !d) return null;
+             return { y, mo, d };
+         }
+
+         function startOfDay(ts) {
+             const d = new Date(Number(ts) || Date.now());
+             d.setHours(0, 0, 0, 0);
+             return d.getTime();
+         }
+
+         function clampToLast7DaysTs(ts) {
+             const end = startOfDay(Date.now()) + 24 * 60 * 60 * 1000 - 1;
+             const start = startOfDay(Date.now() - 6 * 24 * 60 * 60 * 1000);
+             const t = Number(ts) || Date.now();
+             return Math.min(end, Math.max(start, t));
+         }
+
+         function withSameTimeOfDay(oldTs, newDay) {
+             const old = new Date(Number(oldTs) || Date.now());
+             const d = new Date(newDay.getTime());
+             d.setHours(old.getHours(), old.getMinutes(), old.getSeconds(), old.getMilliseconds());
+             return d.getTime();
+         }
+
+         function getDailyGoal() {
+             const v = Number(localStorage.getItem(STORAGE_KEY_GOAL));
+             return Number.isFinite(v) && v > 0 ? v : 1200;
+         }
+
+         function setDailyGoal(v) {
+             try {
+                 localStorage.setItem(STORAGE_KEY_GOAL, String(v));
+             } catch (e) {
+             }
+         }
+
+         function renderGoalSummary() {
+             const goal = getDailyGoal();
+             const range = document.getElementById('goal-range');
+             const label = document.getElementById('goal-value');
+             if (range) range.value = String(goal);
+             if (label) label.textContent = `${goal} 卡`;
+
+             const weekStart = startOfDay(Date.now() - 6 * 24 * 60 * 60 * 1000);
+             const weekEnd = startOfDay(Date.now()) + 24 * 60 * 60 * 1000 - 1;
+             const list = readHistory();
+             const week = list.filter(x => {
+                 const t = Number(x.ts) || 0;
+                 const d0 = startOfDay(t);
+                 return d0 >= weekStart && d0 <= weekEnd;
+             });
+             const mealsCount = week.length;
+             const avgCalories = mealsCount > 0
+                 ? Math.round(week.reduce((s, x) => s + (Number(x.total && x.total.calories) || 0), 0) / mealsCount)
+                 : 0;
+             const rate = goal > 0 ? Math.min(999, Math.round((avgCalories / goal) * 100)) : 0;
+
+             const rateEl = document.getElementById('goal-rate');
+             if (rateEl) rateEl.textContent = `${rate}%`;
+             const avgEl = document.getElementById('goal-avg');
+             if (avgEl) avgEl.textContent = `近7天平均：${avgCalories} 卡`;
+             const barEl = document.getElementById('goal-bar');
+             if (barEl) barEl.style.width = `${Math.min(100, Math.max(0, rate))}%`;
+         }
+
+         function isDemoActive() {
+             try {
+                 return localStorage.getItem(STORAGE_KEY_DEMO_ACTIVE) === '1';
+             } catch (e) {
+                 return false;
+             }
+         }
+
+         function setDemoActive(v) {
+             try {
+                 if (v) localStorage.setItem(STORAGE_KEY_DEMO_ACTIVE, '1');
+                 else localStorage.removeItem(STORAGE_KEY_DEMO_ACTIVE);
+             } catch (e) {
+             }
+         }
+
+         function backupHistoryIfNeeded() {
+             if (isDemoActive()) return;
+             try {
+                 const current = readHistory();
+                 localStorage.setItem(STORAGE_KEY_HISTORY_BACKUP, JSON.stringify(current));
+             } catch (e) {
+             }
+         }
+
+         function restoreHistoryBackup() {
+             try {
+                 const raw = localStorage.getItem(STORAGE_KEY_HISTORY_BACKUP);
+                 if (!raw) return false;
+                 const parsed = JSON.parse(raw);
+                 writeHistory(Array.isArray(parsed) ? parsed : []);
+                 localStorage.removeItem(STORAGE_KEY_HISTORY_BACKUP);
+                 return true;
+             } catch (e) {
+                 return false;
+             }
+         }
+
+         function buildDemoHistory() {
+             const now = Date.now();
+             const times = ['早餐', '午餐', '晚餐'];
+             const demoMeals = [
+                 { staple: '燕麦', protein: '鸡胸', vegetable: '西兰花' },
+                 { staple: '米饭', protein: '牛肉', vegetable: '生菜' },
+                 { staple: '全麦面包', protein: '鸡蛋', vegetable: '番茄' },
+                 { staple: '红薯', protein: '三文鱼', vegetable: '芦笋' }
+             ];
+             const items = [];
+             for (let i = 0; i < 7; i++) {
+                 const dayStart = startOfDay(now - i * 24 * 60 * 60 * 1000);
+                 const ts = dayStart + (11 + (i % 3) * 3) * 60 * 60 * 1000;
+                 const base = 1450 + (3 - (i % 4)) * 120 + (i % 2 === 0 ? 90 : -60);
+                 const calories = Math.max(900, Math.round(base));
+                 const sugar = Math.max(10, Math.round(22 + (i % 5) * 4));
+                 const m = demoMeals[i % demoMeals.length];
+                 items.push({
+                     ts,
+                     time: times[i % times.length],
+                     city: 'Beijing',
+                     maxCalories: '',
+                     total: {
+                         calories,
+                         sugar_content: sugar
+                     },
+                     meal: { staple: m.staple, protein: m.protein, vegetable: m.vegetable }
+                 });
+             }
+             items.sort((a, b) => (Number(b.ts) || 0) - (Number(a.ts) || 0));
+             return items;
+         }
+
+         function runDemo() {
+             backupHistoryIfNeeded();
+             setDemoActive(true);
+             writeHistory(buildDemoHistory());
+             setDailyGoal(1600);
+             switchPage('progress');
+             renderProgress();
+         }
+
+         function exitDemo() {
+             if (!isDemoActive()) return;
+             const ok = restoreHistoryBackup();
+             setDemoActive(false);
+             if (ok) {
+                 renderProgress();
+                 renderGoalSummary();
+             }
+         }
+
+         function normalizeText(s) {
+             return safeText(s).toLowerCase().replace(/\s+/g, ' ').trim();
+         }
+
+         function formatDateTime(ts) {
+             const d = new Date(Number(ts) || Date.now());
+             const mm = String(d.getMonth() + 1).padStart(2, '0');
+             const dd = String(d.getDate()).padStart(2, '0');
+             const hh = String(d.getHours()).padStart(2, '0');
+             const mi = String(d.getMinutes()).padStart(2, '0');
+             return `${mm}-${dd} ${hh}:${mi}`;
+         }
+
+         function mealNameLine(meal) {
+             const s = meal && meal.staple ? meal.staple.food_name : '';
+             const p = meal && meal.protein ? meal.protein.food_name : '';
+             const v = meal && meal.vegetable ? meal.vegetable.food_name : '';
+             const parts = [s, p, v].filter(Boolean);
+             return parts.length > 0 ? parts.join(' / ') : '（空记录）';
+         }
+
+         async function ensureFoodsCatalogLoaded() {
+             if (Array.isArray(state.foodsCatalog)) return true;
+             if (!state.foodsCatalogLoadingPromise) {
+                 state.foodsCatalogLoadingPromise = (async () => {
+                     try {
+                         const resp = await fetch('/debug/foods');
+                         const data = await resp.json();
+                         state.foodsCatalog = Array.isArray(data) ? data : [];
+                         return true;
+                     } catch (e) {
+                         state.foodsCatalog = [];
+                         return false;
+                     }
+                 })();
+             }
+             return await state.foodsCatalogLoadingPromise;
+         }
+
+         function addFoodToHistory(food) {
+             if (!food) return;
+             const slotMap = { '主食': 'staple', '蛋白': 'protein', '蔬菜': 'vegetable' };
+             const slot = slotMap[safeText(food.food_type)] || 'staple';
+             const meal = { staple: null, protein: null, vegetable: null };
+             meal[slot] = food;
+             const item = {
+                 ts: Date.now(),
+                 time: safeText(food.recommend_time) || '',
+                 city: '',
+                 maxCalories: '',
+                 total: {
+                     calories: Number(food.calories) || 0,
+                     sugar_content: Number(food.sugar_content) || 0
+                 },
+                 meal
+             };
+             const list = readHistory();
+             list.unshift(item);
+             writeHistory(list.slice(0, 50));
+             showToast();
+         }
+
+         function addHistoryItemAgain(historyItem) {
+             if (!historyItem) return;
+             const copy = JSON.parse(JSON.stringify(historyItem));
+             copy.ts = Date.now();
+             const list = readHistory();
+             list.unshift(copy);
+             writeHistory(list.slice(0, 50));
+             showToast();
+         }
+
+         function searchHistory(query, timeFilter) {
+             const q = normalizeText(query);
+             let list = readHistory();
+             if (timeFilter) {
+                 list = list.filter(x => safeText(x.time) === timeFilter);
+             }
+             if (!q) return list;
+             return list.filter(x => {
+                 const t = normalizeText(x.time);
+                 const city = normalizeText(x.city);
+                 const names = normalizeText(mealNameLine(x.meal));
+                 return t.includes(q) || city.includes(q) || names.includes(q);
+             });
+         }
+
+         function searchFoods(query, timeFilter, typeFilter) {
+             const q = normalizeText(query);
+             let list = Array.isArray(state.foodsCatalog) ? state.foodsCatalog : [];
+             if (timeFilter) {
+                 list = list.filter(x => safeText(x.recommend_time) === timeFilter);
+             }
+             if (typeFilter) {
+                 list = list.filter(x => safeText(x.food_type) === typeFilter);
+             }
+             if (!q) return list;
+             return list.filter(x => {
+                 const name = normalizeText(x.food_name);
+                 const type = normalizeText(x.food_type);
+                 const time = normalizeText(x.recommend_time);
+                 const allergens = normalizeText(x.allergens);
+                 return name.includes(q) || type.includes(q) || time.includes(q) || allergens.includes(q);
+             });
+         }
+
+         function renderSearchResults(historyItems, foodItems, limit) {
+             const resultsEl = document.getElementById('search-results');
+             const emptyEl = document.getElementById('search-empty');
+             if (!resultsEl) return;
+
+             const items = [];
+             historyItems.forEach((x, idx) => items.push({ kind: 'history', idx, data: x }));
+             foodItems.forEach((x, idx) => items.push({ kind: 'food', idx, data: x }));
+
+             const sliced = items.slice(0, limit);
+             if (emptyEl) emptyEl.style.display = sliced.length === 0 ? 'block' : 'none';
+
+             resultsEl.innerHTML = sliced.map((item, i) => {
+                 if (item.kind === 'history') {
+                     const h = item.data;
+                     const title = mealNameLine(h.meal);
+                     const cals = Number(h.total && h.total.calories) || 0;
+                     const sugar = Number(h.total && h.total.sugar_content) || 0;
+                     const time = safeText(h.time) || '未知餐次';
+                     const dt = formatDateTime(h.ts);
+                     return `
+                         <div class="result-card" data-kind="history" data-index="${item.idx}">
+                             <div class="result-head">
+                                 <div class="result-left">
+                                     <img class="result-thumb" src="${svgThumbDataUri(title, `历史 · ${time}`)}" data-fallback="${svgThumbDataUri(title, `历史 · ${time}`)}" alt="${safeText(title)}" loading="lazy" />
+                                     <div class="result-title">${safeText(title)}</div>
+                                 </div>
+                                 <span class="badge">历史 · ${time}</span>
+                             </div>
+                             <div class="result-meta">时间：${dt}；热量：${cals} 卡；糖分：${sugar} 克</div>
+                             <div class="result-buttons">
+                                 <button type="button" class="btn-secondary" data-action="add-again">再次添加到餐食</button>
+                             </div>
+                         </div>
+                     `;
+                 }
+
+                 const f = item.data;
+                 const title = safeText(f.food_name);
+                 const cals = Number(f.calories) || 0;
+                 const sugar = Number(f.sugar_content) || 0;
+                 const time = safeText(f.recommend_time) || '未知';
+                 const type = safeText(f.food_type) || '未知';
+                 return `
+                     <div class="result-card" data-kind="food" data-index="${item.idx}">
+                         <div class="result-head">
+                             <div class="result-left">
+                                 <img class="result-thumb" src="${getFoodImageSrc(f)}" data-fallback="${getFoodImageFallback(f)}" alt="${title}" loading="lazy" />
+                                 <div class="result-title">${title}</div>
+                             </div>
+                             <span class="badge">食物库 · ${type} · ${time}</span>
+                         </div>
+                         <div class="result-meta">热量：${cals} 卡；糖分：${sugar} 克；过敏源：${safeText(f.allergens)}</div>
+                         <div class="result-buttons">
+                             <button type="button" class="btn-secondary" data-action="add-food">添加到餐食</button>
+                         </div>
+                     </div>
+                 `;
+             }).join('');
+         }
+
+         async function runSearch() {
+             const query = document.getElementById('search-query') ? document.getElementById('search-query').value : '';
+             const source = document.getElementById('search-source') ? document.getElementById('search-source').value : 'history';
+             const timeFilter = document.getElementById('search-time') ? document.getElementById('search-time').value : '';
+             const typeFilter = document.getElementById('search-type') ? document.getElementById('search-type').value : '';
+             const limit = Number(document.getElementById('search-limit') ? document.getElementById('search-limit').value : 10) || 10;
+             const statusEl = document.getElementById('search-status');
+
+             const historyResults = (source === 'history' || source === 'all') ? searchHistory(query, timeFilter) : [];
+             let foodResults = [];
+
+             if (source === 'foods' || source === 'all') {
+                 if (statusEl) statusEl.textContent = '正在加载食物库...';
+                 const ok = await ensureFoodsCatalogLoaded();
+                 if (!ok && statusEl) {
+                     statusEl.textContent = '食物库加载失败，已仅使用历史记录搜索。';
+                 }
+                 foodResults = searchFoods(query, timeFilter, typeFilter);
+             }
+
+             if (source === 'history') {
+                 if (statusEl) statusEl.textContent = `历史记录：${historyResults.length} 条匹配`; 
+             } else if (source === 'foods') {
+                 if (statusEl) statusEl.textContent = `食物库：${foodResults.length} 条匹配`; 
+             } else {
+                 if (statusEl) statusEl.textContent = `历史 ${historyResults.length} 条 + 食物库 ${foodResults.length} 条`; 
+             }
+
+             renderSearchResults(historyResults, foodResults, limit);
+         }
+
+         function switchPage(page) {
+             const pageMap = {
+                 dashboard: 'page-dashboard',
+                 search: 'page-search',
+                 progress: 'page-progress',
+                 profile: 'page-profile'
+             };
+             const targetId = pageMap[page] || pageMap.dashboard;
+             Object.values(pageMap).forEach(id => {
+                 const el = document.getElementById(id);
+                 if (!el) return;
+                 el.classList.toggle('is-active', id === targetId);
+             });
+             document.querySelectorAll('.nav-btn').forEach(btn => {
+                 btn.classList.toggle('is-active', btn.getAttribute('data-page') === page);
+             });
+
+             try {
+                 localStorage.setItem(STORAGE_KEY_ACTIVE_PAGE, page);
+             } catch (e) {
+             }
+
+             if (page === 'progress') {
+                 renderProgress();
+             }
+             if (page === 'profile') {
+                 renderGoalSummary();
+             }
+
+             if (page !== 'dashboard') {
+                 closeResultModal();
+             }
+         }
+
+         function showToast() {
+             const el = document.getElementById('add-success-toast');
+             if (!el) return;
+             el.classList.add('is-visible');
+             window.clearTimeout(showToast._t);
+             showToast._t = window.setTimeout(() => {
+                 el.classList.remove('is-visible');
+             }, 1600);
+         }
+
+         function addCurrentMealToHistory() {
+             if (!state.lastMealResponse || !state.lastMealResponse.meal) return;
+             const time = document.getElementById('time').value;
+             const city = document.getElementById('city').value;
+             const maxCalories = document.getElementById('max_calories').value;
+             const meal = state.lastMealResponse.meal;
+             const item = {
+                 ts: Date.now(),
+                 time,
+                 city,
+                 maxCalories,
+                 total: meal.nutrition_total || {},
+                 meal: {
+                     staple: meal.staple || null,
+                     protein: meal.protein || null,
+                     vegetable: meal.vegetable || null
+                 }
+             };
+             const list = readHistory();
+             list.unshift(item);
+             const trimmed = list.slice(0, 50);
+             writeHistory(trimmed);
+             showToast();
+         }
+
+         function destroyProgressChart() {
+             if (!state.progressChart) return;
+             try {
+                 state.progressChart.destroy();
+             } catch (e) {
+             }
+             state.progressChart = null;
+         }
+
+         function renderProgress() {
+             const list = readHistory();
+             const goal = getDailyGoal();
+             const weekStart = startOfDay(Date.now() - 6 * 24 * 60 * 60 * 1000);
+             const weekEnd = startOfDay(Date.now()) + 24 * 60 * 60 * 1000 - 1;
+             const week = list.filter(x => {
+                 const t = Number(x.ts) || 0;
+                 const d0 = startOfDay(t);
+                 return d0 >= weekStart && d0 <= weekEnd;
+             });
+             const mealsCount = week.length;
+             const avgCalories = mealsCount > 0
+                 ? Math.round(week.reduce((s, x) => s + (Number(x.total && x.total.calories) || 0), 0) / mealsCount)
+                 : 0;
+             const rate = goal > 0 ? Math.min(999, Math.round((avgCalories / goal) * 100)) : 0;
+
+             const mealsEl = document.getElementById('stat-meals');
+             const avgEl = document.getElementById('stat-avg');
+             const rateEl = document.getElementById('stat-rate');
+             if (mealsEl) mealsEl.textContent = String(mealsCount);
+             if (avgEl) avgEl.textContent = `${avgCalories} 卡`;
+             if (rateEl) rateEl.textContent = `${rate}%`;
+
+             const emptyEl = document.getElementById('progress-empty');
+             if (emptyEl) emptyEl.style.display = list.length === 0 ? 'block' : 'none';
+
+             const canvas = document.getElementById('calorie-chart');
+             if (!canvas) return;
+             if (!window.Chart) {
+                 ensureChartJsLoaded().then(() => renderProgress());
+                 return;
+             }
+
+             const metric = state.progressMetric === 'sugar' ? 'sugar' : 'calories';
+             const metricLabel = metric === 'sugar' ? '糖分（克）' : '热量（卡路里）';
+             const metricField = metric === 'sugar' ? 'sugar_content' : 'calories';
+
+             const endDay = startOfDay(Date.now());
+             const dayStarts = Array.from({ length: 7 }, (_, i) => endDay - (6 - i) * 24 * 60 * 60 * 1000);
+             const dayKeys = dayStarts.map(ts => dayKeyFromTs(ts));
+             const labels = dayStarts.map(ts => formatShortDateLabel(ts));
+
+             const sumMap = new Map(dayKeys.map(k => [k, 0]));
+             const countMap = new Map(dayKeys.map(k => [k, 0]));
+             week.forEach(item => {
+                 const k = dayKeyFromTs(Number(item.ts) || Date.now());
+                 if (!sumMap.has(k)) return;
+                 const v = Number(item.total && item.total[metricField]) || 0;
+                 sumMap.set(k, (sumMap.get(k) || 0) + v);
+                 countMap.set(k, (countMap.get(k) || 0) + 1);
+             });
+
+             const values = dayKeys.map(k => Math.round(Number(sumMap.get(k)) || 0));
+
+             const ctx = canvas.getContext('2d');
+             const grad = ctx.createLinearGradient(0, 0, 0, 260);
+             grad.addColorStop(0, 'rgba(37, 99, 235, 0.26)');
+             grad.addColorStop(1, 'rgba(37, 99, 235, 0.02)');
+
+             const goalDataset = (metric === 'calories' && goal > 0)
+                 ? [{
+                     label: '目标',
+                     data: labels.map(() => Number(goal) || 0),
+                     borderColor: 'rgba(56, 189, 248, 0.95)',
+                     borderDash: [6, 6],
+                     borderWidth: 2,
+                     pointRadius: 0,
+                     fill: false,
+                     tension: 0
+                 }]
+                 : [];
+
+             destroyProgressChart();
+             state.progressChart = new Chart(ctx, {
+                 type: 'line',
+                 data: {
+                     labels,
+                     datasets: [
+                         {
+                             label: metricLabel,
+                             data: values,
+                             tension: 0.35,
+                             borderColor: 'rgba(37, 99, 235, 1)',
+                             backgroundColor: grad,
+                             fill: true,
+                             pointRadius: 3,
+                             pointHoverRadius: 6,
+                             pointBackgroundColor: '#ffffff',
+                             pointBorderColor: 'rgba(37, 99, 235, 1)',
+                             pointBorderWidth: 2
+                         },
+                         ...goalDataset
+                     ]
+                 },
+                 options: {
+                     responsive: true,
+                     maintainAspectRatio: false,
+                     plugins: {
+                         legend: {
+                             display: false
+                         },
+                         tooltip: {
+                             callbacks: {
+                                 title: (items) => {
+                                     const it = items && items[0];
+                                     if (!it) return '';
+                                     const idx = it.dataIndex;
+                                     const key = dayKeys[idx] || '';
+                                     return key;
+                                 },
+                                 label: (ctx2) => {
+                                     if (!ctx2) return '';
+                                     const idx = ctx2.dataIndex;
+                                     const key = dayKeys[idx] || '';
+                                     const cnt = Number(countMap.get(key)) || 0;
+                                     const val = Number(ctx2.raw) || 0;
+                                     const unit = metric === 'sugar' ? '克' : '卡';
+                                     return `${metric === 'sugar' ? '糖分' : '热量'}：${val} ${unit}（${cnt} 次记录）`;
+                                 }
+                             }
+                         }
+                     },
+                     scales: {
+                         x: {
+                             grid: { display: false }
+                         },
+                         y: {
+                             ticks: { precision: 0 },
+                             grid: { color: 'rgba(15, 23, 42, 0.06)' }
+                         }
+                     }
+                 }
+             });
+
+             const historyEl = document.getElementById('progress-history');
+             if (historyEl) {
+                 const minDay = dayKeyFromTs(Date.now() - 6 * 24 * 60 * 60 * 1000);
+                 const maxDay = dayKeyFromTs(Date.now());
+                 const items = week.slice().sort((a, b) => (Number(b.ts) || 0) - (Number(a.ts) || 0)).slice(0, 12);
+                 if (items.length === 0) {
+                     historyEl.innerHTML = '<p class="hint" style="margin:0;">暂无近 7 天记录。</p>';
+                 } else {
+                     historyEl.innerHTML = items.map((x, idx) => {
+                         const t = Number(x.ts) || Date.now();
+                         const dateLabel = dayKeyFromTs(t);
+                         const cals = Number(x.total && x.total.calories) || 0;
+                         const sugar = Number(x.total && x.total.sugar_content) || 0;
+                         const title = `${safeText(x.time)} · ${safeText(x.city)}`;
+                         const meta = `热量 ${cals} 卡 · 糖分 ${sugar} 克 · ${safeText(x.maxCalories)} 卡上限`;
+                         return `
+                             <div class="history-item" data-h-idx="${idx}">
+                                 <div class="history-main">
+                                     <div class="history-title">${title}</div>
+                                     <div class="history-meta">${dateLabel} · ${meta}</div>
+                                 </div>
+                                 <div class="history-right">
+                                     <input class="date-input" type="date" data-action="edit-date" data-ts="${t}" data-index="${list.indexOf(x)}" value="${formatDateInputValue(t)}" min="${minDay}" max="${maxDay}" />
+                                 </div>
+                             </div>
+                         `;
+                     }).join('');
+                 }
+             }
+         }
+
+         function renderMealCard(title, key, food) {
+             if (!food) {
+                 return `
+                     <div class="meal-card" data-slot="${key}">
+                         <h3>${title}</h3>
+                         <p>暂无推荐</p>
+                     </div>
+                 `;
+             }
+             return `
+                 <div class="meal-card" data-slot="${key}">
+                     <img class="food-thumb" src="${getFoodImageSrc(food)}" data-fallback="${getFoodImageFallback(food)}" alt="${safeText(food.food_name)}" loading="lazy" />
+                     <h3>${title}</h3>
+                     <p><span>名称:</span> ${safeText(food.food_name)}</p>
+                     <p><span>热量:</span> ${safeText(food.calories)} 卡路里</p>
+                     <p><span>糖分:</span> ${safeText(food.sugar_content)} 克</p>
+                     <p><span>过敏源:</span> ${safeText(food.allergens)}</p>
+                     <div class="meal-actions">
+                         <button class="btn-swap" type="button" data-swap-key="${key}">换一个</button>
+                     </div>
+                 </div>
+             `;
+         }
+
+         function renderMeal() {
+             const foodListDiv = document.getElementById('food-list');
+             if (!state.lastMealResponse) {
+                 foodListDiv.innerHTML = '';
+                 return;
+             }
+
+             const data = state.lastMealResponse;
+             if (!data.meal) {
+                 destroyChart();
+                 const message = data.message ? safeText(data.message) : '没有找到符合条件的食物';
+                 foodListDiv.innerHTML = `<div class="result-anim"><p>${message}</p></div>`;
+                 setSubtitle('暂无可用推荐');
+                 return;
+             }
+
+             const meal = data.meal;
+             const total = meal.nutrition_total || {};
+             const explanations = Array.isArray(meal.explanations) ? meal.explanations : [];
+             const warnings = Array.isArray(meal.warnings) ? meal.warnings : [];
+
+             let html = `
+                 <div class="result-anim">
+                     <div class="meta-box">
+                         <h3>一餐组合</h3>
+                         <div class="meal-grid">
+                             ${renderMealCard('主食', 'staple', meal.staple)}
+                             ${renderMealCard('蛋白', 'protein', meal.protein)}
+                             ${renderMealCard('蔬菜', 'vegetable', meal.vegetable)}
+                         </div>
+                     </div>
+                     <div class="meta-box">
+                         <h3>营养汇总</h3>
+                         <p><span>总热量:</span> ${safeText(total.calories)} 卡路里</p>
+                         <p><span>总糖分:</span> ${safeText(total.sugar_content)} 克</p>
+                     </div>
+                     <div class="meta-box">
+                         <div class="chart-title">
+                             <h3 style="margin: 0;">食物类型分布</h3>
+                             <span>按本餐热量占比</span>
+                         </div>
+                         <p class="hint" id="chart-status" style="margin: 6px 0 0 0;"></p>
+                         <div class="chart-box">
+                             <div class="chart-wrap" style="height: 260px;">
+                                 <canvas id="food-type-chart" aria-label="食物类型分布图表"></canvas>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="meta-box">
+                         <button id="add-to-meal-btn" type="button">添加到餐食</button>
+                     </div>
+                 </div>
+             `;
+
+             if (explanations.length > 0) {
+                 html += `
+                     <div class="meta-box">
+                         <h3>推荐理由</h3>
+                         <div class="pill-group">
+                             ${explanations.map(t => `<span class="pill">${safeText(t)}</span>`).join('')}
+                         </div>
+                     </div>
+                 `;
+             }
+
+             if (warnings.length > 0) {
+                 html += `
+                     <div class="meta-box">
+                         <h3>提示</h3>
+                         <div class="pill-group">
+                             ${warnings.map(t => `<span class="pill is-warn">${safeText(t)}</span>`).join('')}
+                         </div>
+                     </div>
+                 `;
+             }
+
+             destroyChart();
+             foodListDiv.innerHTML = html;
+             setSubtitle('已生成推荐，可继续换一换');
+             renderChart();
+         }
+
+         function swapMealItem(key) {
+             if (!state.lastMealResponse || !state.lastMealResponse.meal || !state.lastMealResponse.alternatives) return;
+             const altList = state.lastMealResponse.alternatives[key];
+             if (!Array.isArray(altList) || altList.length === 0) return;
+
+             const current = state.lastMealResponse.meal[key];
+             const next = altList.shift();
+             if (current) altList.push(current);
+             state.lastMealResponse.meal[key] = next;
+             recalcTotals();
+             renderMeal();
+         }
+
+         async function getRecommendations() {
+            const time = document.getElementById('time').value;
+            const city = document.getElementById('city').value;
+            const maxCalories = document.getElementById('max_calories').value;
+            const conditionEl = document.getElementById('condition');
+            const condition = conditionEl ? String(conditionEl.value || '').trim() : '';
+
+             setLoading(true);
+             setSubtitle('正在生成推荐...');
+             openResultModal();
+
+             try {
+                const params = new URLSearchParams({
+                    user_id: String(state.userId),
+                    time: String(time),
+                    city: String(city),
+                    max_calories: String(maxCalories)
+                });
+                if (condition) params.set('condition', condition);
+                 const resp = await fetch(`/recommend/meal?${params.toString()}`);
+
+                 const rawText = await resp.text();
+                 let data = null;
+                 try {
+                     data = rawText ? JSON.parse(rawText) : null;
+                 } catch (e) {
+                     data = null;
+                 }
+
+                 if (!resp.ok) {
+                     const preview = (rawText || '').slice(0, 220);
+                     throw new Error(`HTTP ${resp.status}: ${preview}`);
+                 }
+
+                 if (!data) {
+                     const preview = (rawText || '').slice(0, 220);
+                     throw new Error(`返回不是 JSON：${preview}`);
+                 }
+
+                 state.lastMealResponse = data;
+                 renderMeal();
+            } catch (e) {
+                console.error('Error:', e);
+                state.lastMealResponse = null;
+                 const msg = String(e && e.message ? e.message : e);
+                 const box = document.getElementById('food-list');
+                 if (box) {
+                     box.innerHTML = '<p id="req-error"></p>';
+                     const p = document.getElementById('req-error');
+                     if (p) p.textContent = `请求失败：${msg}`;
+                 }
+                 setSubtitle('请求失败（请查看错误详情）');
+            } finally {
+               setLoading(false);
+           }
+       }
+
+        async function verifyWeatherKey() {
+             const cityEl = document.getElementById('verify-city');
+             const keyEl = document.getElementById('verify-key');
+             const resultEl = document.getElementById('verify-result');
+             if (!cityEl || !resultEl) return;
+
+             const city = String(cityEl.value || 'Beijing').trim() || 'Beijing';
+             const key = keyEl ? String(keyEl.value || '').trim() : '';
+             resultEl.textContent = '正在验证...';
+
+             try {
+                 const params = new URLSearchParams({ city });
+                 if (key) params.set('api_key', key);
+                 const resp = await fetch(`/api/verify_weather?${params.toString()}`);
+                 const data = await resp.json();
+
+                 if (data && data.ok) {
+                     const tempText = (data.temp_c === null || data.temp_c === undefined) ? '未知' : `${data.temp_c}°C`;
+                     resultEl.textContent = `成功：${data.city} - ${data.weather || 'Unknown'}，${tempText}`;
+                 } else {
+                     const code = data && data.status_code ? data.status_code : '未知';
+                     const msg = data && data.message ? data.message : '验证失败';
+                     resultEl.textContent = `失败（${code}）：${msg}`;
+                 }
+             } catch (e) {
+                 console.error(e);
+                 resultEl.textContent = `请求失败：${e}`;
+             }
+         }
+
+         function setActiveTime(time) {
+             const timeSelect = document.getElementById('time');
+             if (timeSelect) timeSelect.value = time;
+             document.querySelectorAll('.tab-btn').forEach(btn => {
+                 btn.classList.toggle('is-active', btn.dataset.time === time);
+             });
+         }
+
+         document.addEventListener('DOMContentLoaded', () => {
+             if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                 try {
+                     window.lucide.createIcons();
+                 } catch (e) {
+                 }
+             }
+
+             const condHidden = document.getElementById('condition');
+             const condChips = document.getElementById('condition-chips');
+             const condCustom = document.getElementById('condition-custom');
+             if (condHidden && condChips) {
+                 const selected = new Set();
+                 const syncHidden = () => {
+                     condHidden.value = Array.from(selected).join(',');
+                 };
+                 condChips.addEventListener('click', (e) => {
+                     const target = e.target;
+                     if (!(target instanceof HTMLElement)) return;
+                     const btn = target.closest('button[data-cond]');
+                     if (!(btn instanceof HTMLButtonElement)) return;
+                     const v = String(btn.getAttribute('data-cond') || '').trim();
+                     if (!v) return;
+                     if (selected.has(v)) {
+                         selected.delete(v);
+                         btn.classList.remove('is-selected');
+                     } else {
+                         selected.add(v);
+                         btn.classList.add('is-selected');
+                     }
+                     syncHidden();
+                 });
+
+                 if (condCustom) {
+                     condCustom.addEventListener('keydown', (e) => {
+                         if (e.key !== 'Enter') return;
+                         e.preventDefault();
+                         const v = String(condCustom.value || '').trim();
+                         if (!v) return;
+
+                         if (!selected.has(v)) {
+                             selected.add(v);
+                             const b = document.createElement('button');
+                             b.type = 'button';
+                             b.className = 'chip is-selected';
+                             b.setAttribute('data-cond', v);
+                             b.textContent = v;
+                             condChips.appendChild(b);
+                             syncHidden();
+                         }
+                         condCustom.value = '';
+                     });
+                 }
+             }
+
+             const btnDemoRun = document.getElementById('btn-demo-run');
+             if (btnDemoRun) {
+                 btnDemoRun.addEventListener('click', () => {
+                     runDemo();
+                 });
+             }
+             const btnDemoExit = document.getElementById('btn-demo-exit');
+             if (btnDemoExit) {
+                 btnDemoExit.addEventListener('click', () => {
+                     exitDemo();
+                 });
+             }
+
+             document.querySelectorAll('.seg-btn').forEach(btn => {
+                 btn.addEventListener('click', () => {
+                     const metric = btn.getAttribute('data-metric');
+                     state.progressMetric = metric === 'sugar' ? 'sugar' : 'calories';
+                     document.querySelectorAll('.seg-btn').forEach(x => {
+                         x.classList.toggle('is-active', x.getAttribute('data-metric') === state.progressMetric);
+                     });
+                     renderProgress();
+                 });
+             });
+
+             const progressHistory = document.getElementById('progress-history');
+             if (progressHistory) {
+                 progressHistory.addEventListener('change', (e) => {
+                     const target = e.target;
+                     if (!(target instanceof HTMLInputElement)) return;
+                     if (target.getAttribute('data-action') !== 'edit-date') return;
+
+                     const idx = Number(target.getAttribute('data-index'));
+                     if (!Number.isFinite(idx) || idx < 0) return;
+
+                     const parsed = parseDateInputValue(target.value);
+                     const list = readHistory();
+                     const item = list[idx];
+                     if (!item) {
+                         renderProgress();
+                         return;
+                     }
+
+                     if (!parsed) {
+                         target.value = formatDateInputValue(Number(item.ts) || Date.now());
+                         return;
+                     }
+
+                     const newDay = new Date(parsed.y, parsed.mo - 1, parsed.d);
+                     let newTs = withSameTimeOfDay(Number(item.ts) || Date.now(), newDay);
+                     newTs = clampToLast7DaysTs(newTs);
+                     item.ts = newTs;
+
+                     writeHistory(list);
+                     renderProgress();
+                 });
+             }
+
+             const closeBtn = document.getElementById('btn-close-result');
+             if (closeBtn) closeBtn.addEventListener('click', () => closeResultModal());
+             const modal = document.getElementById('result-modal');
+             if (modal) {
+                 modal.addEventListener('click', (e) => {
+                     const target = e.target;
+                     if (!(target instanceof HTMLElement)) return;
+                     if (target.getAttribute('data-close') === '1') closeResultModal();
+                 });
+             }
+             window.addEventListener('keydown', (e) => {
+                 if (e.key === 'Escape') closeResultModal();
+             });
+
+             window.addEventListener('error', (e) => {
+                 const target = e.target;
+                 if (!(target instanceof HTMLImageElement)) return;
+                 const fallback = target.getAttribute('data-fallback');
+                 if (!fallback) return;
+                 if (target.getAttribute('data-fallback-used') === '1') return;
+                 target.setAttribute('data-fallback-used', '1');
+                 target.src = fallback;
+             }, true);
+
+             const form = document.getElementById('recommendation-form');
+             form.addEventListener('submit', (e) => {
+                 e.preventDefault();
+                 getRecommendations();
+             });
+
+             document.querySelectorAll('.nav-btn').forEach(btn => {
+                 btn.addEventListener('click', () => {
+                     const page = btn.getAttribute('data-page');
+                     switchPage(page);
+                 });
+             });
+
+             const btnGoDashboard = document.getElementById('btn-go-dashboard');
+             if (btnGoDashboard) {
+                 btnGoDashboard.addEventListener('click', () => switchPage('dashboard'));
+             }
+
+             const btnSearch = document.getElementById('btn-search');
+             if (btnSearch) btnSearch.addEventListener('click', () => runSearch());
+
+             const btnSearchReset = document.getElementById('btn-search-reset');
+             if (btnSearchReset) {
+                 btnSearchReset.addEventListener('click', () => {
+                     const q = document.getElementById('search-query');
+                     const source = document.getElementById('search-source');
+                     const time = document.getElementById('search-time');
+                     const type = document.getElementById('search-type');
+                     const limit = document.getElementById('search-limit');
+                     if (q) q.value = '';
+                     if (source) source.value = 'history';
+                     if (time) time.value = '';
+                     if (type) type.value = '';
+                     if (limit) limit.value = '10';
+                     const statusEl = document.getElementById('search-status');
+                     if (statusEl) statusEl.textContent = '';
+                     const emptyEl = document.getElementById('search-empty');
+                     if (emptyEl) emptyEl.style.display = 'none';
+                     const resultsEl = document.getElementById('search-results');
+                     if (resultsEl) resultsEl.innerHTML = '';
+                 });
+             }
+
+             const searchQuery = document.getElementById('search-query');
+             if (searchQuery) {
+                 searchQuery.addEventListener('keydown', (e) => {
+                     if (e.key === 'Enter') {
+                         e.preventDefault();
+                         runSearch();
+                     }
+                 });
+             }
+
+             const chips = document.getElementById('search-chips');
+             if (chips) {
+                 chips.addEventListener('click', (e) => {
+                     const target = e.target;
+                     if (!(target instanceof HTMLElement)) return;
+                     if (target.getAttribute('data-action') !== 'chip') return;
+                     const q = target.getAttribute('data-q') || '';
+                     const input = document.getElementById('search-query');
+                     if (input) input.value = q;
+                     runSearch();
+                 });
+             }
+
+             const searchResultsEl = document.getElementById('search-results');
+             if (searchResultsEl) {
+                 searchResultsEl.addEventListener('click', (e) => {
+                     const target = e.target;
+                     if (!(target instanceof HTMLElement)) return;
+                     const action = target.getAttribute('data-action');
+                     if (!action) return;
+                     const card = target.closest('.result-card');
+                     if (!card) return;
+                     const kind = card.getAttribute('data-kind');
+                     const idx = Number(card.getAttribute('data-index'));
+                     if (!Number.isFinite(idx)) return;
+
+                     if (kind === 'history' && action === 'add-again') {
+                         const list = readHistory();
+                         const item = list[idx];
+                         addHistoryItemAgain(item);
+                         return;
+                     }
+                     if (kind === 'food' && action === 'add-food') {
+                         const food = Array.isArray(state.foodsCatalog) ? state.foodsCatalog[idx] : null;
+                         addFoodToHistory(food);
+                         return;
+                     }
+                 });
+             }
+
+             document.querySelectorAll('.tab-btn').forEach(btn => {
+                 btn.addEventListener('click', () => {
+                     const t = btn.dataset.time;
+                     setActiveTime(t);
+                     getRecommendations();
+                 });
+             });
+
+             document.getElementById('food-list').addEventListener('click', (e) => {
+                 const target = e.target;
+                 if (!(target instanceof HTMLElement)) return;
+                 const key = target.getAttribute('data-swap-key');
+                 if (!key) return;
+                 swapMealItem(key);
+             });
+
+             document.getElementById('food-list').addEventListener('click', (e) => {
+                 const target = e.target;
+                 if (!(target instanceof HTMLElement)) return;
+                 if (target.id !== 'add-to-meal-btn') return;
+                 addCurrentMealToHistory();
+             });
+
+             const goalRange = document.getElementById('goal-range');
+             if (goalRange) {
+                 goalRange.addEventListener('input', () => {
+                     const v = Number(goalRange.value) || 1200;
+                     setDailyGoal(v);
+                     renderGoalSummary();
+                 });
+             }
+
+             const btnClearHistory = document.getElementById('btn-clear-history');
+             if (btnClearHistory) {
+                 btnClearHistory.addEventListener('click', () => {
+                     writeHistory([]);
+                     renderProgress();
+                     showToast();
+                 });
+             }
+
+             const btnVerifyWeather = document.getElementById('btn-verify-weather');
+             if (btnVerifyWeather) {
+                 btnVerifyWeather.addEventListener('click', () => {
+                     verifyWeatherKey();
+                 });
+             }
+
+             const verifyKeyInput = document.getElementById('verify-key');
+             if (verifyKeyInput) {
+                 verifyKeyInput.addEventListener('keydown', (e) => {
+                     if (e.key === 'Enter') {
+                         e.preventDefault();
+                         verifyWeatherKey();
+                     }
+                 });
+             }
+
+             const initialPage = (() => {
+                 try {
+                     return localStorage.getItem(STORAGE_KEY_ACTIVE_PAGE) || 'dashboard';
+                 } catch (e) {
+                     return 'dashboard';
+                 }
+             })();
+             switchPage(initialPage);
+
+             setActiveTime(document.getElementById('time').value);
+         });
+     </script>
+ </body>
+ </html>
